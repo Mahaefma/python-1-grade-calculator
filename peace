@@ -1,0 +1,92 @@
+# Import necessary modules
+import random
+import time
+
+# Define the ranks and suits
+ranks = ("2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A")
+suits = ("hearts", "diamonds", "clubs", "spades")
+
+# Create a deck of cards
+deck = [(rank, suit) for rank in ranks for suit in suits]
+
+# Shuffle the deck
+random.shuffle(deck)
+
+# Split the deck into two hands
+player1_hand = deck[:26]
+player2_hand = deck[26:]
+
+def card_comparison(p1_card, p2_card):
+    p1_rank_index = ranks.index(p1_card[0])
+    p2_rank_index = ranks.index(p2_card[0])
+    if p1_rank_index > p2_rank_index:
+        return 1
+    elif p1_rank_index < p2_rank_index:
+        return 2
+    else:
+        return 0
+
+def play_round(player1_hand, player2_hand):
+    p1_card = player1_hand.pop(0)
+    p2_card = player2_hand.pop(0)
+    print(f"Player 1 plays: {p1_card}")
+    print(f"Player 2 plays: {p2_card}")
+    
+    result = card_comparison(p1_card, p2_card)
+    if result == 1:
+        print("Player 1 wins the round!")
+        player1_hand.extend([p1_card, p2_card])
+    elif result == 2:
+        print("Player 2 wins the round!")
+        player2_hand.extend([p1_card, p2_card])
+    else:
+        print("War!")
+        war(player1_hand, player2_hand, [p1_card, p2_card])
+
+def war(player1_hand, player2_hand, pot):
+    if len(player1_hand) < 4 or len(player2_hand) < 4:
+        if len(player1_hand) < 4:
+            player2_hand.extend(player1_hand + pot)
+            player1_hand.clear()
+        else:
+            player1_hand.extend(player2_hand + pot)
+            player2_hand.clear()
+        return
+    
+    pot.extend(player1_hand[:3])
+    pot.extend(player2_hand[:3])
+    player1_hand = player1_hand[3:]
+    player2_hand = player2_hand[3:]
+    
+    p1_card = player1_hand.pop(0)
+    p2_card = player2_hand.pop(0)
+    pot.extend([p1_card, p2_card])
+    print(f"Player 1 plays: {p1_card}")
+    print(f"Player 2 plays: {p2_card}")
+    
+    result = card_comparison(p1_card, p2_card)
+    if result == 1:
+        print("Player 1 wins the war!")
+        player1_hand.extend(pot)
+    elif result == 2:
+        print("Player 2 wins the war!")
+        player2_hand.extend(pot)
+    else:
+        print("Another war!")
+        war(player1_hand, player2_hand, pot)
+
+def play_game():
+    print("Welcome to the Peace Card Game!")
+    while player1_hand and player2_hand:
+        input("Press enter to continue...")
+        print(f"Player 1 has {len(player1_hand)} cards. Player 2 has {len(player2_hand)} cards.")
+        play_round(player1_hand, player2_hand)
+        time.sleep(1)
+    
+    if player1_hand:
+        print("Player 1 wins the game!")
+    else:
+        print("Player 2 wins the game!")
+
+# Call the main function to start the game
+play_game()
